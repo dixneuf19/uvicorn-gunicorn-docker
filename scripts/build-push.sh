@@ -2,14 +2,12 @@
 
 set -e
 
-use_tag="tiangolo/uvicorn-gunicorn:$NAME"
+use_tag="dixneuf19/uvicorn-gunicorn:$NAME"
 use_dated_tag="${use_tag}-$(date -I)"
 
 bash scripts/build.sh
 
-docker tag "$use_tag" "$use_dated_tag"
-
 bash scripts/docker-login.sh
 
-docker push "$use_tag"
-docker push "$use_dated_tag"
+docker buildx build --platform linux/amd64,linux/arm64,linux/386,linux/arm/v7 -t "$use_tag" --file "./docker-images/${DOCKERFILE}.dockerfile" "./docker-images/" --push
+docker buildx build --platform linux/amd64,linux/arm64,linux/386,linux/arm/v7 -t "$use_dated_tag" --file "./docker-images/${DOCKERFILE}.dockerfile" "./docker-images/" --push
